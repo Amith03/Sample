@@ -1,0 +1,186 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+//creating a node
+
+typedef struct Node {
+  signed int coeff;
+  unsigned int expon;
+  struct Node* next;
+} Node_t;
+
+
+
+//------------------------------------
+
+
+
+Node_t* insert(Node_t* poly, int coeff, int expon) {
+  Node_t* term = NULL;
+  Node_t* temp = NULL;
+  term = (Node_t*)malloc(sizeof(Node_t));
+   term->coeff = coeff;
+  term->expon = expon;
+
+  if (poly==NULL) { // polynomial is empty
+    poly = term;
+    return poly;
+
+  } // polynomial is not empty. Add to end
+  temp = poly;
+  while (temp->next != NULL) {
+    temp = temp->next;
+  }
+  temp->next = term;
+   return poly; // the first node
+}
+
+//traverse and print the each polynomial
+
+void traverse(Node_t* poly) {
+  if (poly != NULL) {
+    printf("%dx**%u ", poly->coeff, poly->expon);
+    poly = poly->next;
+  }
+
+  while (poly != NULL) {
+    if (poly->coeff > 0) {
+        printf("+ %dx**%u ", poly->coeff, poly->expon);
+   } else {
+        printf("%dx**%u ", poly->coeff, poly->expon);
+    }
+    poly = poly->next;
+  }
+  printf("\n");
+
+}
+
+float eval(Node_t *poly,float x){
+double sum = 0;
+while(poly != NULL){
+     sum = sum + poly->coeff*pow(x,poly->expon);
+     poly = poly->next;
+
+}
+printf("%f",sum);
+return sum;
+}
+
+//subtraction of 2 polynomials
+
+Node_t* psub(Node_t* p1, Node_t* p2) {
+  Node_t* diff=NULL;
+  while ((p1 !=NULL) && (p2 != NULL)) {
+     if (p1->expon > p2->expon) {
+
+      // take the term from p1, add to diff
+
+      diff = insert(diff, p1->coeff, p1->expon);
+      p1 = p1->next;
+    } else if (p1->expon == p2->expon) {
+
+      // both expon are same add them subtarct the coeff
+      int scoeff = p1->coeff - p2->coeff;
+      if (scoeff != 0) {
+    diff = insert(diff, scoeff, p1->expon);
+      }
+      p1 = p1->next;
+      p2 = p2->next;
+    } else {
+      // term of p2 is bigger add to diff
+      diff = insert(diff, -p2->coeff, p2->expon);
+      p2 = p2->next;
+    }
+  }
+
+  // add all remaining terms of p2 to diff
+
+  while (p2 != NULL) {
+    diff = insert(diff,-p2->coeff, p2->expon);
+    p2 = p2->next;
+  }
+
+  // add all remaining terms of p1 to diff
+  while (p1 != NULL) {
+    diff = insert(diff, p1->coeff, p1->expon);
+    p1 = p1->next;
+  }
+  return diff;
+}
+
+//sorting of the exponents
+void sort(Node_t *poly)
+{
+     Node_t *t;
+     Node_t *s;
+     int x;
+     t=poly;
+     while(t!=NULL)
+     {
+          s=t->next;
+          while(s!=NULL)
+          {
+               if(t->expon<s->expon)
+               {
+                    x=t->expon;
+                    t->expon=s->expon;
+                    s->expon=x;
+               }
+               s=s->next;
+          }
+          t=t->next;
+      }
+
+           t=poly;
+            traverse(poly);
+            t=t->next;
+}
+
+//main function where difference is traversed and printed
+int main(int argc, char *argv[argc + 1]) {
+  Node_t*  p1 = NULL;
+  Node_t*  p2 = NULL;
+  Node_t* diff=NULL;
+  signed int coeff;
+  unsigned int expon;
+  short unsigned int p1terms = 0;
+  short unsigned int p2terms = 0;
+  float val=3;
+  printf("Enter the value to be evaluated : ");
+scanf("%f",&val);
+  // read the number of terms for each polynomial and
+  // build a linked list of polynomials
+  printf("Enter no of polynomials : ");
+  scanf("%hu %hu", &p1terms, &p2terms);
+  if(p1terms<=10 && p2terms<=10 && p1terms>1 && p2terms>1){
+  for (size_t i=0; i<p1terms; i++) {
+    scanf("%d %u", &coeff, &expon);
+    p1 = insert(p1, coeff, expon);
+  }
+  for (size_t i=0; i<p2terms; i++) {
+    scanf("%d %u", &coeff, &expon);
+    p2 = insert(p2, coeff, expon);
+  }
+
+printf("p1(x) = ");
+sort(p1);{
+printf("The Value of P1 = " );
+eval(p1,val);
+}
+printf("\np2(x) = ");
+sort(p2);{
+printf("The Value of P2 = " );
+eval(p2,val);
+}
+diff = psub(p1, p2);
+printf("\ndifference = ");
+traverse(diff);
+printf("The Final Value = ");
+eval(diff,val);
+}
+else{
+printf("invalid\n");
+}
+
+}
