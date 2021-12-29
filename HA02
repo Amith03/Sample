@@ -146,7 +146,7 @@ int main(int argc, char *argv[argc + 1]) {
   unsigned int expon;
   short unsigned int p1terms = 0;
   short unsigned int p2terms = 0;
-  float val=3;
+  float val;
   printf("Enter the value to be evaluated : ");
 scanf("%f",&val);
   // read the number of terms for each polynomial and
